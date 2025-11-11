@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 interface AuthPageProps {
-  onLogin: (userType: 'manager' | 'tenant') => void;
+  onLogin: (userType: 'manager' | 'tenant' | 'super-admin') => void;
   onGoToLanding: () => void;
 }
 
@@ -9,8 +9,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onGoToLanding }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
-  const [userType, setUserType] = useState<'manager' | 'tenant'>('manager');
-
+  const [userType, setUserType] = useState<'manager' | 'tenant' | 'super-admin'>('manager');
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Simulate login/signup
@@ -77,6 +76,17 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onGoToLanding }) => {
                   onChange={() => setUserType('tenant')}
                 />
                 <span className="ml-2">Tenant</span>
+              </label>
+              <label className="inline-flex items-center">
+                <input
+                  type="radio"
+                  className="form-radio"
+                  name="userType"
+                  value="super-admin"
+                  checked={userType === 'super-admin'}
+                  onChange={() => setUserType('super-admin')}
+                />
+                <span className="ml-2">Super Admin</span>
               </label>
             </div>
           </div>
