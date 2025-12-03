@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { CheckCircle2, Clock, IndianRupee } from 'lucide-react';
-import { supabase, Subscription } from '../lib/supabase';
+import { Subscription } from '../lib/supabase';
 
 export function Subscriptions() {
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
@@ -8,42 +8,8 @@ export function Subscriptions() {
     active: 0,
     expiringSoon: 0,
     monthlyRevenue: 0,
-  });
+  }); 
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchSubscriptions();
-  }, []);
-
-  async function fetchSubscriptions() {
-    try {
-      const { data, error } = await supabase
-        .from('subscriptions')
-        .select('*')
-        .order('renewal_date', { ascending: true });
-
-      if (error) throw error;
-
-      const subscriptionsData = data || [];
-      setSubscriptions(subscriptionsData);
-
-      const activeCount = subscriptionsData.filter((s) => s.status === 'Active').length;
-      const expiringSoonCount = subscriptionsData.filter((s) => s.status === 'Expiring Soon').length;
-      const monthlyRevenue = subscriptionsData
-        .filter((s) => s.status === 'Active')
-        .reduce((sum, s) => sum + s.price, 0);
-
-      setStats({
-        active: activeCount,
-        expiringSoon: expiringSoonCount,
-        monthlyRevenue,
-      });
-    } catch (error) {
-      console.error('Error fetching subscriptions:', error);
-    } finally {
-      setLoading(false);
-    }
-  }
 
   const getPlanColor = (plan: string) => {
     return plan === 'Pro' ? 'text-blue-700 bg-blue-100' : 'text-gray-700 bg-gray-100';

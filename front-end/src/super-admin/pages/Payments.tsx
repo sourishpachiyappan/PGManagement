@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { TrendingUp, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
-import { supabase, Payment } from '../lib/supabase';
+import { Payment } from '../lib/supabase';
 
 export function Payments() {
   const [payments, setPayments] = useState<Payment[]>([]);
@@ -12,44 +12,6 @@ export function Payments() {
     collectionRate: 0,
   });
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchPayments();
-  }, []);
-
-  async function fetchPayments() {
-    try {
-      const { data, error } = await supabase
-        .from('payments')
-        .select('*, pgs(*)')
-        .order('payment_date', { ascending: false });
-
-      if (error) throw error;
-
-      const paymentsData = data || [];
-      setPayments(paymentsData);
-
-      const totalRevenue = paymentsData.reduce((sum, p) => sum + p.amount, 0);
-      const collected = paymentsData
-        .filter((p) => p.status === 'Collected')
-        .reduce((sum, p) => sum + p.amount, 0);
-      const pendingCount = paymentsData.filter((p) => p.status === 'Pending').length;
-      const overdueCount = paymentsData.filter((p) => p.status === 'Overdue').length;
-      const collectionRate = totalRevenue > 0 ? Math.round((collected / totalRevenue) * 100) : 0;
-
-      setStats({
-        totalRevenue,
-        collected,
-        pending: pendingCount,
-        overdue: overdueCount,
-        collectionRate,
-      });
-    } catch (error) {
-      console.error('Error fetching payments:', error);
-    } finally {
-      setLoading(false);
-    }
-  }
 
   const getStatusIcon = (status: string) => {
     switch (status) {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Mail, Phone, Building2, Search } from 'lucide-react';
-import { supabase, Manager } from '../lib/supabase';
+import { Manager } from '../lib/supabase';
 
 interface ManagerWithStats extends Manager {
   totalCapacity: number;
@@ -13,49 +13,7 @@ export function Managers() {
   const [managers, setManagers] = useState<ManagerWithStats[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-
-  useEffect(() => {
-    fetchManagers();
-  }, []);
-
-  async function fetchManagers() {
-    try {
-      const { data: managersData, error: managersError } = await supabase
-        .from('managers')
-        .select('*')
-        .order('name');
-
-      if (managersError) throw managersError;
-
-      const { data: pgsData, error: pgsError } = await supabase
-        .from('pgs')
-        .select('manager_id, current_occupancy, total_capacity');
-
-      if (pgsError) throw pgsError;
-
-      const managersWithStats = managersData.map((manager) => {
-        const managerPGs = pgsData.filter((pg) => pg.manager_id === manager.id);
-        const totalCapacity = managerPGs.reduce((sum, pg) => sum + pg.total_capacity, 0);
-        const currentTenants = managerPGs.reduce((sum, pg) => sum + pg.current_occupancy, 0);
-        const occupancyRate = totalCapacity > 0 ? Math.round((currentTenants / totalCapacity) * 100) : 0;
-
-        return {
-          ...manager,
-          totalCapacity,
-          currentTenants,
-          occupancyRate,
-          pgCount: managerPGs.length,
-        };
-      });
-
-      setManagers(managersWithStats);
-    } catch (error) {
-      console.error('Error fetching managers:', error);
-    } finally {
-      setLoading(false);
-    }
-  }
-
+  
   const filteredManagers = managers.filter((manager) =>
     manager.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     manager.email.toLowerCase().includes(searchTerm.toLowerCase())

@@ -1,31 +1,11 @@
 import { useEffect, useState } from 'react';
 import { MapPin, User, Search } from 'lucide-react';
-import { supabase, PG } from '../lib/supabase';
+import { PG } from '../lib/supabase';
 
 export function PGProperties() {
   const [pgs, setPGs] = useState<PG[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-
-  useEffect(() => {
-    fetchPGs();
-  }, []);
-
-  async function fetchPGs() {
-    try {
-      const { data, error } = await supabase
-        .from('pgs')
-        .select('*, managers(*)')
-        .order('name');
-
-      if (error) throw error;
-      setPGs(data || []);
-    } catch (error) {
-      console.error('Error fetching PGs:', error);
-    } finally {
-      setLoading(false);
-    }
-  }
 
   const filteredPGs = pgs.filter((pg) =>
     pg.name.toLowerCase().includes(searchTerm.toLowerCase()) ||

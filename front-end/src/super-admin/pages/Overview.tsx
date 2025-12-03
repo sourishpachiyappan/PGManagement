@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Building2, Users, Home, TrendingUp, ArrowUp, CheckCircle2 } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+// Supabase imports and logic removed as per user request
 
 interface Stats {
   totalPGs: number;
@@ -28,49 +28,22 @@ export function Overview() {
     managerPerformance: 0,
     renewalRate: 80,
   });
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false); // Set to false since no data is being fetched
 
-  useEffect(() => {
-    fetchStats();
-  }, []);
-
-  async function fetchStats() {
-    try {
-      const [pgsResult, managersResult, subscriptionsResult, paymentsResult] = await Promise.all([
-        supabase.from('pgs').select('*'),
-        supabase.from('managers').select('*'),
-        supabase.from('subscriptions').select('*').eq('status', 'Active'),
-        supabase.from('payments').select('*').eq('status', 'Collected'),
-      ]);
-
-      const pgs = pgsResult.data || [];
-      const managers = managersResult.data || [];
-      const subscriptions = subscriptionsResult.data || [];
-      const payments = paymentsResult.data || [];
-
-      const totalTenants = pgs.reduce((sum, pg) => sum + pg.current_occupancy, 0);
-      const totalCapacity = pgs.reduce((sum, pg) => sum + pg.total_capacity, 0);
-      const monthlyRevenue = payments.reduce((sum, payment) => sum + payment.amount, 0);
-      const avgOccupancy = totalCapacity > 0 ? (totalTenants / totalCapacity) * 100 : 0;
-
-      setStats({
-        totalPGs: pgs.length,
-        totalManagers: managers.length,
-        totalTenants,
-        activeSubscriptions: subscriptions.length,
-        monthlyRevenue,
-        averagePerPG: pgs.length > 0 ? Math.round(monthlyRevenue / pgs.length) : 0,
-        collectionRate: 94,
-        avgOccupancy: Math.round(avgOccupancy),
-        managerPerformance: 89,
-        renewalRate: 80,
-      });
-    } catch (error) {
-      console.error('Error fetching stats:', error);
-    } finally {
-      setLoading(false);
-    }
-  }
+  // No data fetching from Supabase now
+  // useEffect(() => {
+  //   async function getStats() {
+  //     try {
+  //       const fetchedStats = await fetchOverviewStats();
+  //       setStats(fetchedStats);
+  //     } catch (error) {
+  //       console.error('Error fetching stats in Overview:', error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   }
+  //   getStats();
+  // }, []);
 
   if (loading) {
     return (
