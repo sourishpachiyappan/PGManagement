@@ -6,6 +6,8 @@ const { Tenant, Manager, SuperAdmin } = require('../models/User');
 const signup = async (req, res) => {
   const { email, password, userType, ...userData } = req.body;
 
+  console.log(req.body);
+
   try {
     // Check if user already exists
     let existingUser;
@@ -16,11 +18,12 @@ const signup = async (req, res) => {
     } else if (userType === 'super-admin') {
       existingUser = await SuperAdmin.findOne({ email });
     }
-
+    
     if (existingUser) {
       return res.status(400).json({ message: `User with email ${email} already exists.` });
     }
-
+    
+    console.log(userData);
     // Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -63,6 +66,8 @@ const signup = async (req, res) => {
 const login = async (req, res) => {
   const { email, password, userType } = req.body;
 
+  console.log(req.body)
+
   try {
     let user;
     if (userType === 'tenant') {
@@ -78,6 +83,8 @@ const login = async (req, res) => {
     if (!user) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
+
+    console.log(user)
 
     // Check password
     const isMatch = await bcrypt.compare(password, user.password);

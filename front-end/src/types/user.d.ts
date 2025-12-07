@@ -42,3 +42,26 @@ export interface SuperAdminUser {
   email: string;
   password?: string; // Password should ideally not be stored directly or passed around
 }
+
+
+export interface PG {
+  _id: string; // Mongoose adds _id
+  owner_id?: string;
+  manager_id?: string;
+  name: string;
+  description?: string;
+  location: string;
+  pg_type?: "boys" | "girls" | "unisex";
+  total_inmates: number; 
+  occupied_inmates: number; 
+  no_of_rooms: number;
+  room_count_per_each_sharing?: {
+    single: number;
+    double: number;
+    triple: number;
+  };
+  ac_type?: "ac" | "non_ac";
+  createdAt: string;
+  updatedAt: string;
+  // Assuming 'status' will be derived or added if necessary
+}

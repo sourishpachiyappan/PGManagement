@@ -1,27 +1,20 @@
-const express = require('express');
+const express = require("express");
 const {
   createTenant,
   getTenants,
   getTenantById,
   updateTenant,
   deleteTenant,
-} = require('../controllers/tenantController');
+} = require("../controllers/tenantController");
+const authMiddleware = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-// Route to create a new tenant 
-router.post('/', createTenant);
-
-// Route to get all tenants
-router.get('/', getTenants);
-
-// Route to get a single tenant by ID
-router.get('/:id', getTenantById);
-
-// Route to update a tenant by ID
-router.put('/:id', updateTenant);
-
-// Route to delete a tenant by ID
-router.delete('/:id', deleteTenant);
+// All tenant routes now require authentication
+router.post("/", authMiddleware, createTenant);
+router.get("/", authMiddleware, getTenants);
+router.get("/:id", authMiddleware, getTenantById);
+router.put("/:id", authMiddleware, updateTenant);
+router.delete("/:id", authMiddleware, deleteTenant);
 
 module.exports = router;
