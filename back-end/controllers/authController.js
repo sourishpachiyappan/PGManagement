@@ -1,120 +1,48 @@
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { Tenant, Manager, SuperAdmin } = require('../models/User');
 
-// Register a new user (Tenant, Manager, or SuperAdmin)
-const signup = async (req, res) => {
-  const { email, password, userType, ...userData } = req.body;
-
-  console.log(req.body);
-
+const verifyToken = async (req, res, next) => {
   try {
-    // Check if user already exists
-    let existingUser;
-    if (userType === 'tenant') {
-      existingUser = await Tenant.findOne({ email });
-    } else if (userType === 'manager') {
-      existingUser = await Manager.findOne({ email });
-    } else if (userType === 'super-admin') {
-      existingUser = await SuperAdmin.findOne({ email });
-    }
-    
-    if (existingUser) {
-      return res.status(400).json({ message: `User with email ${email} already exists.` });
-    }
-    
-    console.log(userData);
-    // Hash password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const authHeader = req.headers.authorization;
 
-    let newUser;
-    if (userType === 'tenant') {
-      newUser = new Tenant({ ...userData, email, password: hashedPassword });
-    } else if (userType === 'manager') {
-      newUser = new Manager({ ...userData, email, password: hashedPassword });
-    } else if (userType === 'super-admin') {
-      newUser = new SuperAdmin({ ...userData, email, password: hashedPassword });
-    } else {
-      return res.status(400).json({ message: 'Invalid user type provided.' });
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({ message: "Access denied. Token missing." });
     }
 
-    await newUser.save();
+    const token = authHeader.split(" ")[1];
 
-    // Create a token for the new user (optional for signup, but good for immediate login)
-    const token = jwt.sign({ id: newUser._id, userType: userType }, process.env.JWT_SECRET, {
-      expiresIn: '1d', // Token valid for 1 day
-    });
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
 
-    res.status(201).json({
-      message: `${userType} registered successfully`,
-      user: {
-        id: newUser._id,
-        email: newUser.email,
-        userType: userType,
-        ...userData // Include other relevant user data
-      },
-      token,
-    });
+    next()
   } catch (error) {
-    console.error(`Error during ${userType} signup:`, error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    return res.status(401).json({ message: "Invalid or expired token." });
   }
-};
+}
 
-// Log in a user
-const login = async (req, res) => {
-  const { email, password, userType } = req.body;
+const verifyRole = (roles) => {
+  return (req, res, next) => {
+    try {
+      if (!Array.isArray(roles)) {
+        roles = [roles];
+      }
 
-  console.log(req.body)
+      if (!req.user || !req.user.role) {
+        return res.status(401).json({
+          message: "Unauthorized. User not authenticated."
+        });
+      }
 
-  try {
-    let user;
-    if (userType === 'tenant') {
-      user = await Tenant.findOne({ email });
-    } else if (userType === 'manager') {
-      user = await Manager.findOne({ email });
-    } else if (userType === 'super-admin') {
-      user = await SuperAdmin.findOne({ email });
-    } else {
-      return res.status(400).json({ message: 'Invalid user type provided.' });
+      if (!roles.includes(req.user.role)) {
+        return res.status(403).json({
+          message: "You are not authorized to perform this action"
+        });
+      }
+
+      next();
+    } catch (error) {
+      return res.status(401).json({ message: "You are not authorized to perform this action" });
     }
-
-    if (!user) {
-      return res.status(400).json({ message: 'Invalid credentials' });
-    }
-
-    console.log(user)
-
-    // Check password
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });
-    }
-
-    // Generate JWT
-    const token = jwt.sign({ id: user._id, userType: userType }, process.env.JWT_SECRET, {
-      expiresIn: '1d', // Token valid for 1 day
-    });
-
-    res.status(200).json({
-      message: 'Logged in successfully',
-      user: {
-        id: user._id,
-        email: user.email,
-        userType: userType,
-        name: user.name, // Assuming all user types have a 'name' field
-        // Add other relevant user data you want to send to the frontend
-      },
-      token,
-    });
-  } catch (error) {
-    console.error(`Error during ${userType} login:`, error);
-    res.status(500).json({ message: 'Server error', error: error.message });
   }
-};
+}
 
-module.exports = {
-  signup,
-  login,
-};
+module.exports = { verifyRole, verifyToken }
