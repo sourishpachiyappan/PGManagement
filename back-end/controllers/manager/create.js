@@ -78,6 +78,7 @@ exports.handleCreate = async (req, res) => {
                 message: error.errorText
             })
         }
+        
         else {
             console.error(`Error in creating Manager: `, error);
             res.status(500).json({ message: 'create Manager error', error: error.message });
