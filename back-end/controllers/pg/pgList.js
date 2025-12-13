@@ -1,8 +1,13 @@
+const pgService = require('../../services/pgService');
 
+const helper = require('./helper');
 
 exports.getPgDetails = async (req, res) => {
     try {
-        
+        const id = req.query.id;
+        const pgDetails = await pgService.findOne({ _id: id });
+
+        res.status(200).json(pgDetails);
     } catch (error) {
         if (error.errorCode) {
             res.status(400).send({
@@ -20,7 +25,8 @@ exports.getPgDetails = async (req, res) => {
 
 exports.listPGs = async (req, res) => {
     try {
-        
+        const pgList = await helper.getPgList({ status: 'active' });
+        res.status(200).json(pgList);
     } catch (error) {
         if (error.errorCode) {
             res.status(400).send({

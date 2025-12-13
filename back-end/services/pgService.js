@@ -13,7 +13,7 @@ const create = async (input) => {
 
 const findOne = async (query) => {
     try {
-        const data = await model.findOne(query)
+        const data = await model.findOne(query).populate('managerId')
         return data
     } catch (error) {
         console.error(error)
@@ -23,7 +23,7 @@ const findOne = async (query) => {
 
 const find = async (query) => {
     try {
-        return await model.find(query)
+        return await model.find(query).populate('managerId')
     } catch (error) {
         console.error(error)
         throw error
