@@ -1,18 +1,4 @@
-const model = require('../models/users')
-
-const createAdmin = async (input) => {
-    try {
-        const admin = await model.findOne({ email: input.email })
-        if(admin) return true
-        else {
-            const createAdmin = await model.create(input)
-            console.log("Admin Created SuccessFully", createAdmin)
-        }
-    } catch (error) {
-        console.error(error)
-        throw error
-    }
-}
+const model = require('../models/pg')
 
 const create = async (input) => {
     try {
@@ -45,7 +31,6 @@ const find = async (query) => {
 }
 
 module.exports = {
-    createAdmin,
     create,
     findOne,
     find

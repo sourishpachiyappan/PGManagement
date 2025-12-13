@@ -21,7 +21,8 @@ const startServer = async () => {
     await createAdmin(config.adminUser);
 
     app.use("/api/auth", require('./controllers/auth/routes'));
-    app.use("/api/manager", require('./controllers/manager/routes'))
+    app.use("/api/manager", require('./controllers/manager/routes'));
+    app.use("/api/pg", require('./controllers/pg/routes'));
 
     app.listen(3000, () => {
       console.log("Server running on port 3000");
