@@ -5,7 +5,7 @@ exports.getManager = async (req, res) => {
     try {
         const query = req.query
 
-        const user = await userService.findOne({ email: query.email, status: 'approve' })
+        const user = await userService.findOne({ email: query.email, status: 'approved' })
         if (!user) throw Errors.EC002
         res.status(200).send({
             message: "Manager Fetched Successfully!",
@@ -27,7 +27,8 @@ exports.getManager = async (req, res) => {
 
 exports.listManagers = async (req, res) => {
     try {
-        const managerList = await userService.find({ role: 'manager' })
+        const query = req.query
+        const managerList = await userService.find({ ...query, role: 'manager', status: 'approved' })
         res.status(200).send({
             message: "Manager List Fetched Successfully!",
             data: managerList

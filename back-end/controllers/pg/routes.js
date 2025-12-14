@@ -6,7 +6,7 @@ const { validateCreate, handleCreate } = require('./create')
 const { getPgDetails, listPGs } = require('./pgList')
 
 router.post('/create', verifyToken, verifyRole(['admin']), validateCreate, handleCreate)
-router.get('/', verifyToken, verifyRole(['admin']), getPgDetails)
-router.get('/list', verifyToken, verifyRole(['admin']), listPGs)
+router.get('/', verifyToken, verifyRole(['admin', 'manager']), getPgDetails)
+router.get('/list', verifyToken, verifyRole(['admin', 'manager']), listPGs)
 
 module.exports = router;

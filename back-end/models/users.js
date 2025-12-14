@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-const { boolean } = require('joi');
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -41,9 +40,14 @@ const userSchema = new mongoose.Schema({
         allowNull: false,
         default: 'pending'
     },
+    activePg: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
     assignedPG: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'PG',
+      ref: 'pgs',
       default: null,
     },
 }, { timestamps: true })

@@ -39,6 +39,15 @@ const pgSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: "users",
             required: true
+        },
+        roomDetails: {
+            type: Map,
+            of: {
+                type: Number,
+                min: 1,
+                required: true
+            },
+            required: true
         }
     },
     {

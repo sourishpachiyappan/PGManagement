@@ -1,6 +1,7 @@
 const Joi = require('joi')
 
 const pgService = require('../../services/pgService')
+const userService = require('../../services/userService')
 const Errors = require('./errorCodes')
 
 exports.validateCreate = async (req, res, next) => {
@@ -37,7 +38,14 @@ exports.validateCreate = async (req, res, next) => {
                 .pattern(/^[0-9a-fA-F]{24}$/)
                 .messages({
                     "string.pattern.base": "managerId must be a valid ObjectId"
-                })
+                }),
+
+            roomDetails: Joi.object()
+                .pattern(
+                    Joi.string().pattern(/^\d+$/), // numeric string keys
+                    Joi.number().integer().positive().required() // values like 10, 12
+                )
+                .required()
         });
 
         const { error } = await schema.validate(req.body)
@@ -65,6 +73,7 @@ exports.handleCreate = async (req, res) => {
         if (existingPg) throw Errors.ED001
 
         const pg = await pgService.create(payload)
+        const manager = await userService.update(payload.managerId, { assignedPG: pg._id, activePg: true })
         res.status(200).send({
             message: "PG Created Successfully!",
             data: pg
@@ -77,7 +86,7 @@ exports.handleCreate = async (req, res) => {
                 message: error.errorText
             })
         }
-        
+
         else {
             console.error(`Error in creating PG: `, error);
             res.status(500).json({ message: 'create PG error', error: error.message });

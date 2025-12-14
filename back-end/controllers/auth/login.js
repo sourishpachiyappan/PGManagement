@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const user = require('../../models/users')
+const Errors = require('../manager/errorCodes')
 
 exports.validateLogin = async (req, res, next) => {
     try {
@@ -34,6 +35,7 @@ exports.handleLogin = async (req, res) => {
 
     try {
         const userData = await user.findOne({ email })
+        if (!userData) throw Errors.EC002
         console.log(userData)
 
         // Check password
@@ -51,7 +53,14 @@ exports.handleLogin = async (req, res) => {
             token,
         });
     } catch (error) {
-        console.error(`Error during login:`, error);
-        res.status(500).json({ message: 'Server error', error: error.message });
+        if (error.errorCode) {
+            res.status(400).send({
+                errorCode: error.errorCode,
+                message: error.errorText
+            })
+        } else {
+            console.error(`Error during login:`, error);
+            res.status(500).json({ message: 'Server error', error: error.message });
+        }
     }
 };
