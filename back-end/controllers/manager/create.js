@@ -63,12 +63,12 @@ exports.handleCreate = async (req, res) => {
     try {
         const payload = req.body
 
-        const existingUser = await userService.findOne({ email: payload.email, status: 'approved' })
+        const existingUser = await userService.findOne({ email: payload.email, status: 'approve' })
         if (existingUser) { throw Errors.EC001 }
 
-        const user = await userService.create({ ...req.body, status: 'approved' })
-        res.status(200).send({
-            messsage: "Manager created Successfully!",
+        const user = await userService.create({ ...req.body, status: 'approve' })
+        res.status(201).send({
+            message: "Manager created Successfully!",
             data: user
         })
     } catch (error) {

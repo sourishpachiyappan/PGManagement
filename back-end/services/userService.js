@@ -3,7 +3,7 @@ const model = require('../models/users')
 const createAdmin = async (input) => {
     try {
         const admin = await model.findOne({ email: input.email })
-        if(admin) return true
+        if (admin) return true
         else {
             const createAdmin = await model.create(input)
             console.log("Admin Created SuccessFully", createAdmin)
@@ -35,12 +35,21 @@ const findOne = async (query) => {
     }
 }
 
-const find = async (query) => {
+const find = async (query, projection = {}) => {
+  try {
+    return await model.find(query, projection);
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+const update = async (id, updateData) => {
     try {
-        return await model.find(query)
+        return await model.findByIdAndUpdate(id, updateData);
     } catch (error) {
-        console.error(error)
-        throw error
+        console.error(error);
+        throw error;
     }
 }
 
@@ -48,5 +57,6 @@ module.exports = {
     createAdmin,
     create,
     findOne,
-    find
+    find,
+    update
 }

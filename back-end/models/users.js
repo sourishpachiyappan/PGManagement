@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs')
+const bcrypt = require('bcryptjs');
+const { boolean } = require('joi');
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -39,7 +40,12 @@ const userSchema = new mongoose.Schema({
         required: true,
         allowNull: false,
         default: 'pending'
-    }
+    },
+    assignedPG: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'PG',
+      default: null,
+    },
 }, { timestamps: true })
 
 userSchema.pre("save", async function () {
