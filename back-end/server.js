@@ -26,6 +26,7 @@ const startServer = async () => {
     app.use("/api/auth", require("./controllers/auth/routes"));
     app.use("/api/manager", require("./controllers/manager/routes"));
     app.use("/api/pg", require("./controllers/pg/routes"));
+    app.use('/api/tenant', require('./controllers/tenant/routes'));
 
     app.listen(3000, () => {
       console.log("Server running on port 3000");
