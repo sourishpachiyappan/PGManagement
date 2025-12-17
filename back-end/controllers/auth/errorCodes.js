@@ -10,5 +10,9 @@ module.exports = {
     ET003: {
         errorCode: 'ET003',
         errorText: "Tenant not approved yet"
+    },
+    ET004: {
+        errorCode: 'ET004',
+        errorText: "Tenant is not in pending state"
     }
 }

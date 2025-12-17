@@ -3,7 +3,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const user = require('../../models/users')
-const Errors = require('../manager/errorCodes')
+const Errors = require('../manager/errorCodes');
+const { use } = require('react');
 
 exports.validateLogin = async (req, res, next) => {
     try {
@@ -45,7 +46,7 @@ exports.handleLogin = async (req, res) => {
         }
 
         // Generate JWT
-        const token = jwt.sign({ name: userData.name, email: userData.email, role: userData.role }, process.env.JWT_SECRET, { expiresIn: '1d' });
+        const token = jwt.sign({ id: userData._id, name: userData.name, email: userData.email, role: userData.role }, process.env.JWT_SECRET, { expiresIn: '1d' });
 
         res.status(200).json({
             message: 'Logged in successfully',

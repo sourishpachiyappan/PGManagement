@@ -40,9 +40,30 @@ const findAll = async (query) => {
     }
 }
 
+const findAndUpdate = async (findQuery = {}, updateQuery = {}, options = {}) => {
+    try {
+        const data = await model.findOneAndUpdate(
+            findQuery,
+            updateQuery,
+            {
+                new: true,
+                runValidators: true,
+                ...options
+            }
+        );
+
+        return data;
+    } catch (error) {
+        console.error('findAndUpdate error:', error);
+        throw error;
+    }
+};
+
+
 module.exports = {
     create,
     findOne,
     update,
-    findAll
+    findAll,
+    findAndUpdate
 }

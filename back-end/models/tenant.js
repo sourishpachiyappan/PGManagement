@@ -125,6 +125,17 @@ const tenantSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: 'pgs',
             required: true
+        },
+
+        reason: {
+            type: String,
+            default: null
+        },
+
+        updatedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'users',
+            default: null
         }
     },
     {
